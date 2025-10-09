@@ -8,10 +8,10 @@
 - [x] Настроить подключение к PostgreSQL
 
 ## 2. База данных
-- [ ] Создать Entity User (id, login, password, created_at)
-- [ ] Создать Entity Chat (id, user_id, created_at, updated_at)
-- [ ] Создать Entity Message (id, chat_id, role [user/assistant], content, created_at)
-- [ ] Выполнить миграции базы данных
+- [x] Создать Entity User (id, login, password, created_at)
+- [x] Создать Entity Chat (id, user_id, created_at, updated_at)
+- [x] Создать Entity Message (id, chat_id, role [user/assistant], content, created_at)
+- [x] Выполнить миграции базы данных
 
 ## 3. Система авторизации
 - [ ] Настроить Symfony Security
