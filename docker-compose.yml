@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: psychologist_postgres
+    environment:
+      POSTGRES_DB: psychologist_db
+      POSTGRES_USER: psychologist_user
+      POSTGRES_PASSWORD: psychologist_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - psychologist_network
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: psychologist_php
+    volumes:
+      - .:/var/www/html
+    networks:
+      - psychologist_network
+    depends_on:
+      - postgres
+
+  nginx:
+    image: nginx:alpine
+    container_name: psychologist_nginx
+    ports:
+      - "9090:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - psychologist_network
+    depends_on:
+      - php
+
+volumes:
+  postgres_data:
+
+networks:
+  psychologist_network:
+    driver: bridge

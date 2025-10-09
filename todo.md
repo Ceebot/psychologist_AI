@@ -1,11 +1,11 @@
 # TODO: psychologist_AI
 
 ## 1. Инфраструктура и настройка окружения
-- [ ] Создать Docker Compose с контейнерами: php-fpm, nginx, postgres
-- [ ] Настроить Dockerfile для PHP 8.2+ с необходимыми расширениями
-- [ ] Установить Symfony (последняя версия)
-- [ ] Настроить конфигурацию nginx
-- [ ] Настроить подключение к PostgreSQL
+- [x] Создать Docker Compose с контейнерами: php-fpm, nginx, postgres
+- [x] Настроить Dockerfile для PHP 8.2+ с необходимыми расширениями
+- [x] Установить Symfony (последняя версия)
+- [x] Настроить конфигурацию nginx
+- [x] Настроить подключение к PostgreSQL
 
 ## 2. База данных
 - [ ] Создать Entity User (id, login, password, created_at)
