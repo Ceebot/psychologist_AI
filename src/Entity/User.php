@@ -6,11 +6,14 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: ['login'], message: 'Этот логин уже используется')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /** Идентификатор пользователя */
@@ -21,6 +24,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /** Логин пользователя (уникальный) */
     #[ORM\Column(length: 180, unique: true, options: ['comment' => 'Логин пользователя'])]
+    #[Assert\NotBlank(message: 'Логин не может быть пустым')]
+    #[Assert\Length(min: 3, max: 180, minMessage: 'Логин должен содержать минимум {{ limit }} символа', maxMessage: 'Логин не может быть длиннее {{ limit }} символов')]
     private ?string $login = null;
 
     /** Хэш пароля */
