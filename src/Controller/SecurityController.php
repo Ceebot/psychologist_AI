@@ -14,6 +14,15 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    #[Route('/', name: 'app_home')]
+    public function home(): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('chat_index');
+        }
+        return $this->redirectToRoute('app_login');
+    }
+
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
@@ -21,7 +30,7 @@ class SecurityController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_chat');
+            return $this->redirectToRoute('chat_index');
         }
 
         $user = new User();
@@ -48,7 +57,7 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_chat');
+            return $this->redirectToRoute('chat_index');
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();

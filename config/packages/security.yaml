@@ -18,13 +18,14 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: app_chat
+                default_target_path: chat_index
                 enable_csrf: true
             logout:
                 path: app_logout
                 target: app_login
 
     access_control:
+        - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }

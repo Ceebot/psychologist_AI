@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Чат #{{ chat.id }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/chat.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="chat-layout" x-data="chatRoom({{ chat.id }}, '{{ (chat.title is not empty ? chat.title : 'Чат №' ~ chat.id)|e('js') }}')">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Психолог AI</h2>
+            <button @click="createNewChat()" class="btn btn-new-chat">+ Новый чат</button>
+        </div>
+        
+        <div class="chat-list">
+            <div class="chat-item active">
+                <div class="chat-item-title" x-text="chatTitle">{{ chat.title is not empty ? chat.title : 'Чат №' ~ chat.id }}</div>
+                <div class="chat-item-date">{{ chat.updatedAt|date('d.m.Y H:i') }}</div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <span>{{ app.user.login }}</span>
+                <a href="{{ path('app_logout') }}" class="logout-link">Выход</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="chat-main">
+        <div class="chat-container">
+            <div class="chat-header">
+                <a href="{{ path('chat_index') }}" class="btn-back">← Назад к списку</a>
+                <h3 x-text="chatTitle">{{ chat.title is not empty ? chat.title : 'Чат №' ~ chat.id }}</h3>
+            </div>
+            
+            <div class="messages-container" id="messages" x-ref="messagesContainer">
+                <template x-for="message in messages" :key="message.id">
+                    <div :class="'message message-' + message.role">
+                        <div class="message-content" x-text="message.content"></div>
+                        <div class="message-time" x-text="formatTime(message.createdAt)"></div>
+                    </div>
+                </template>
+
+                <div x-show="loading" class="message message-assistant">
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="error" class="error-message" x-text="error"></div>
+            </div>
+
+            <form @submit.prevent="sendMessage()" class="message-form">
+                <textarea 
+                    x-model="newMessage"
+                    placeholder="Напишите ваше сообщение..."
+                    rows="3"
+                    @keydown.enter.prevent="if (!$event.shiftKey) sendMessage()"
+                    :disabled="loading"
+                ></textarea>
+                <button type="submit" class="btn btn-send" :disabled="loading || !newMessage.trim()">
+                    <span x-show="!loading">Отправить</span>
+                    <span x-show="loading">Отправка...</span>
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/chat.js') }}"></script>
+{% endblock %}
+

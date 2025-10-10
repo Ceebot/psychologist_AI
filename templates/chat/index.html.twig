@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Чат с психологом{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/chat.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="chat-layout" x-data="chatApp()">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Психолог AI</h2>
+            <button @click="createNewChat()" class="btn btn-new-chat">+ Новый чат</button>
+        </div>
+        
+        <div class="chat-list">
+            {% if chats|length > 0 %}
+                {% for chat in chats %}
+                    <div class="chat-item-wrapper">
+                        <a href="{{ path('chat_show', {id: chat.id}) }}" class="chat-item">
+                            <div class="chat-item-title">{{ chat.title is not empty ? chat.title : 'Чат №' ~ chat.id }}</div>
+                            <div class="chat-item-date">{{ chat.updatedAt|date('d.m.Y H:i') }}</div>
+                        </a>
+                        <button @click.prevent="openDeleteModal({{ chat.id }})" class="btn-delete-chat" title="Удалить чат">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>У вас пока нет чатов</p>
+                    <p class="empty-hint">Создайте новый чат, чтобы начать</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <span>{{ app.user.login }}</span>
+                <a href="{{ path('app_logout') }}" class="logout-link">Выход</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="chat-main">
+        <div class="welcome-screen">
+            <div class="welcome-content">
+                <h1>Добро пожаловать в Психолог AI</h1>
+                <p>Я здесь, чтобы выслушать и помочь вам</p>
+                <p class="welcome-hint">Выберите существующий чат или создайте новый</p>
+            </div>
+        </div>
+    </main>
+
+    {% include 'chat/partials/delete_modal.html.twig' %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/chat.js') }}"></script>
+{% endblock %}
+

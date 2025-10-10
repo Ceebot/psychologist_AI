@@ -1,0 +1,31 @@
+<div x-show="showDeleteModal"
+     x-cloak
+     @click.self="showDeleteModal = false"
+     class="modal-overlay"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0">
+    <div class="modal-content"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95">
+        <div class="modal-header">
+            <h3>Удалить чат?</h3>
+            <button @click="showDeleteModal = false" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Вы действительно хотите удалить этот чат? Все сообщения будут безвозвратно удалены.</p>
+        </div>
+        <div class="modal-footer">
+            <button @click="showDeleteModal = false" class="btn btn-secondary">Отмена</button>
+            <button @click="confirmDelete()" class="btn btn-danger">Удалить</button>
+        </div>
+    </div>
+</div>
+

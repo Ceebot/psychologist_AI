@@ -21,6 +21,10 @@ class Chat
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    /** Название чата */
+    #[ORM\Column(length: 255, nullable: true, options: ['comment' => 'Название чата'])]
+    private ?string $title = null;
+
     /** Дата создания чата */
     #[ORM\Column(options: ['comment' => 'Дата создания чата'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -89,6 +93,17 @@ class Chat
             $this->messages->add($message);
             $message->setChat($this);
         }
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): static
+    {
+        $this->title = $title;
         return $this;
     }
 }

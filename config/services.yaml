@@ -13,3 +13,4 @@ services:
     App\Service\AiService:
         arguments:
             $openRouterApiKey: '%env(OPENROUTER_API_KEY)%'
+            $projectDir: '%kernel.project_dir%'
