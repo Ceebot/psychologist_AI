@@ -38,6 +38,16 @@ services:
     depends_on:
       - php
 
+  adminer:
+    image: adminer:latest
+    container_name: psychologist_adminer
+    ports:
+      - "9091:8080"
+    networks:
+      - psychologist_network
+    depends_on:
+      - postgres
+
 volumes:
   postgres_data:
 
