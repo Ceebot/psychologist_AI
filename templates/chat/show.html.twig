@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="chat-layout" x-data="chatRoom({{ chat.id }}, '{{ (chat.title is not empty ? chat.title : 'Чат №' ~ chat.id)|e('js') }}')">
+<div class="chat-layout" x-data="chatRoom({{ chat.id }}, '{{ (chat.title is not empty ? chat.title : 'Чат №' ~ chat.id)|e('js') }}')" data-csrf-token="{{ csrf_token('chat') }}">
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>Психолог AI</h2>
@@ -15,10 +15,19 @@
         </div>
         
         <div class="chat-list">
-            <div class="chat-item active">
-                <div class="chat-item-title" x-text="chatTitle">{{ chat.title is not empty ? chat.title : 'Чат №' ~ chat.id }}</div>
-                <div class="chat-item-date">{{ chat.updatedAt|date('d.m.Y H:i') }}</div>
-            </div>
+            {% for c in chats %}
+                {% if c.id == chat.id %}
+                    <div class="chat-item active">
+                        <div class="chat-item-title" x-text="chatTitle">{{ c.title is not empty ? c.title : 'Чат №' ~ c.id }}</div>
+                        <div class="chat-item-date">{{ c.updatedAt|date('d.m.Y H:i') }}</div>
+                    </div>
+                {% else %}
+                    <a href="{{ path('chat_show', {id: c.id}) }}" class="chat-item">
+                        <div class="chat-item-title">{{ c.title is not empty ? c.title : 'Чат №' ~ c.id }}</div>
+                        <div class="chat-item-date">{{ c.updatedAt|date('d.m.Y H:i') }}</div>
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="sidebar-footer">
@@ -32,19 +41,19 @@
     <main class="chat-main">
         <div class="chat-container">
             <div class="chat-header">
-                <a href="{{ path('chat_index') }}" class="btn-back">← Назад к списку</a>
+                <a href="{{ path('chat_index') }}" class="btn-back">←  Назад</a>
                 <h3 x-text="chatTitle">{{ chat.title is not empty ? chat.title : 'Чат №' ~ chat.id }}</h3>
             </div>
             
             <div class="messages-container" id="messages" x-ref="messagesContainer">
                 <template x-for="message in messages" :key="message.id">
                     <div :class="'message message-' + message.role">
-                        <div class="message-content" x-text="message.content"></div>
+                        <div class="message-content" x-html="formatMessage(message.content, message.role)"></div>
                         <div class="message-time" x-text="formatTime(message.createdAt)"></div>
                     </div>
                 </template>
 
-                <div x-show="loading" class="message message-assistant">
+                <div x-show="loading" x-cloak class="message message-assistant">
                     <div class="message-content">
                         <div class="typing-indicator">
                             <span></span><span></span><span></span>
@@ -52,12 +61,20 @@
                     </div>
                 </div>
 
-                <div x-show="error" class="error-message" x-text="error"></div>
+                <div x-show="showLimitWarning" x-cloak class="limit-warning" x-transition>
+                    <strong>⚠️ Внимание!</strong><br>
+                    Вы использовали <span x-text="limitInfo.total - limitInfo.remaining"></span> из <span x-text="limitInfo.total"></span> доступных запросов.<br>
+                    Осталось: <strong x-text="limitInfo.remaining"></strong> запросов.<br>
+                    Лимит сбросится через: <strong x-text="formatResetTime()"></strong>
+                </div>
+
+                <div x-show="error" x-cloak class="error-message" x-text="error"></div>
             </div>
 
             <form @submit.prevent="sendMessage()" class="message-form">
                 <textarea 
                     x-model="newMessage"
+                    x-ref="messageInput"
                     placeholder="Напишите ваше сообщение..."
                     rows="3"
                     @keydown.enter.prevent="if (!$event.shiftKey) sendMessage()"

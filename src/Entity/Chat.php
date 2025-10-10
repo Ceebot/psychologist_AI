@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
+#[ORM\Index(name: 'idx_chat_user_updated', columns: ['user_id', 'updated_at'])]
 class Chat
 {
     /** Идентификатор чата */

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="chat-layout" x-data="chatApp()">
+<div class="chat-layout" x-data="chatApp()" data-csrf-token="{{ csrf_token('chat') }}">
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>Психолог AI</h2>

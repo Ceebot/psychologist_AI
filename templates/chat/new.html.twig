@@ -1,0 +1,127 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Новый чат{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/chat.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="chat-layout" x-data="newChatRoom()" data-csrf-token="{{ csrf_token('chat') }}">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Психолог AI</h2>
+            <button @click="window.location.href='/chat/new'" class="btn btn-new-chat">+ Новый чат</button>
+        </div>
+        
+        <div class="chat-list">
+            {% for c in chats %}
+            <a href="{{ path('chat_show', {id: c.id}) }}" class="chat-item">
+                <div class="chat-item-title">{{ c.title is not empty ? c.title : 'Чат №' ~ c.id }}</div>
+                <div class="chat-item-date">{{ c.updatedAt|date('d.m.Y H:i') }}</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <span>{{ app.user.login }}</span>
+                <a href="{{ path('app_logout') }}" class="logout-link">Выход</a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="chat-main">
+        <div class="chat-container">
+            <div class="chat-header">
+                <a href="{{ path('chat_index') }}" class="btn-back">←  Назад</a>
+                <h3>Новый чат</h3>
+            </div>
+            
+            <div class="messages-container" id="messages" x-ref="messagesContainer">
+                <div class="message message-assistant">
+                    <div class="message-content">
+                        <p>{{ greeting }}</p>
+                    </div>
+                </div>
+
+                <div x-show="loading" x-cloak class="message message-assistant">
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="error" x-cloak class="error-message" x-text="error"></div>
+            </div>
+
+            <form @submit.prevent="createChat()" class="message-form">
+                <textarea 
+                    x-model="newMessage"
+                    x-ref="messageInput"
+                    placeholder="Напишите первое сообщение..."
+                    rows="3"
+                    @keydown.enter.prevent="if (!$event.shiftKey) createChat()"
+                    :disabled="loading"
+                ></textarea>
+                <button type="submit" class="btn btn-send" :disabled="loading || !newMessage.trim()">
+                    <span x-show="!loading">Начать чат</span>
+                    <span x-show="loading">Создание...</span>
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('newChatRoom', () => ({
+        newMessage: '',
+        loading: false,
+        error: '',
+
+        init() {
+            this.$nextTick(() => {
+                this.$refs.messageInput?.focus();
+            });
+        },
+
+        createChat() {
+            const message = this.newMessage.trim();
+            if (!message || this.loading) return;
+
+            this.loading = true;
+            this.error = '';
+
+            fetch('/chat/create', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('[data-csrf-token]')?.dataset.csrfToken || ''
+                },
+                body: JSON.stringify({ message })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = `/chat/${data.chatId}`;
+                    } else {
+                        this.loading = false;
+                        this.error = data.error || 'Произошла ошибка';
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                    this.error = 'Ошибка соединения с сервером';
+                    console.error(err);
+                });
+        }
+    }));
+});
+</script>
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}
+
