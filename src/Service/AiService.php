@@ -6,7 +6,7 @@ class AiService
 {
     private const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
     private const MODEL = 'z-ai/glm-4.5-air:free';
-    private const GREETING_MESSAGE = 'Здравствуй! Я Геннадий, психолог-консультант. 😊 Я здесь, чтобы выслушать тебя и помочь разобраться в любой ситуации. Расскажи, что тебя беспокоит?';
+    private const GREETING_MESSAGE = 'Здравствуй! Я психолог-консультант. 😊 Я здесь, чтобы выслушать тебя и помочь разобраться в любой ситуации. Расскажи, что тебя беспокоит?';
     
     private string $apiKey;
     private string $systemPrompt;
@@ -40,7 +40,7 @@ class AiService
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $this->apiKey,
             ],
-            CURLOPT_TIMEOUT => 90,
+            CURLOPT_TIMEOUT => 120,
         ]);
 
         $response = curl_exec($ch);
@@ -90,7 +90,7 @@ class AiService
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $this->apiKey,
             ],
-            CURLOPT_TIMEOUT => 30,
+            CURLOPT_TIMEOUT => 120,
         ]);
 
         $response = curl_exec($ch);
